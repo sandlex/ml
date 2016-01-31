@@ -73,7 +73,8 @@ y = y_converted;
 A1 = [ones(m, 1) X];
 A2 = sigmoid(A1 * Theta1');
 A2 = [ones(m, 1) A2];
-h = sigmoid(A2 * Theta2');
+A3 = sigmoid(A2 * Theta2');
+h = A3;
 
 J_part = 0;
 for i = 1 : m
@@ -84,6 +85,20 @@ end;
 
 comb = [Theta1(:, 2:end)(:); Theta2(:, 2:end)(:)];
 J = 1 / m * J_part + (lambda / (2 * m)) * sum(comb .^ 2);
+
+% Backpropogation
+delta3 = A3 - y;
+delta2 = (delta3 * Theta2) .* A2 .* (1 - A2);
+delta2 = delta2(:, 2 : end);
+
+Theta2_grad = Theta2_grad + delta3' * A2;
+Theta1_grad = Theta1_grad + delta2' * A1;
+tmp1 = (1 / m) * Theta1_grad(:,1);
+tmp2 = (1 / m) * Theta2_grad(:,1);
+Theta1_grad = (1 / m) * (Theta1_grad + lambda * Theta1);
+Theta2_grad = (1 / m) * (Theta2_grad + lambda * Theta2);
+Theta1_grad(:,1) = tmp1;
+Theta2_grad(:,1) = tmp2;
 
 % -------------------------------------------------------------
 
